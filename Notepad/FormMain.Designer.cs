@@ -48,8 +48,9 @@
             цветToolStripMenuItem = new ToolStripMenuItem();
             настройкиToolStripMenuItem = new ToolStripMenuItem();
             panel1 = new Panel();
-            button1 = new Button();
+            buttonItalic = new Button();
             buttonBold = new Button();
+            buttonUnderline = new Button();
             textBoxField = new TextBox();
             contextMenuStripTextBoxField = new ContextMenuStrip(components);
             копироватьToolStripMenuItem1 = new ToolStripMenuItem();
@@ -128,6 +129,7 @@
             правкаToolStripMenuItem.Name = "правкаToolStripMenuItem";
             правкаToolStripMenuItem.Size = new Size(59, 20);
             правкаToolStripMenuItem.Text = "Правка";
+            правкаToolStripMenuItem.DropDownOpening += правкаToolStripMenuItem_DropDownOpening;
             // 
             // копироватьToolStripMenuItem
             // 
@@ -192,7 +194,8 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(button1);
+            panel1.Controls.Add(buttonUnderline);
+            panel1.Controls.Add(buttonItalic);
             panel1.Controls.Add(buttonBold);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 24);
@@ -200,23 +203,38 @@
             panel1.Size = new Size(800, 37);
             panel1.TabIndex = 1;
             // 
-            // button1
+            // buttonItalic
             // 
-            button1.Location = new Point(43, 8);
-            button1.Name = "button1";
-            button1.Size = new Size(28, 23);
-            button1.TabIndex = 1;
-            button1.Text = "B";
-            button1.UseVisualStyleBackColor = true;
+            buttonItalic.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point, 204);
+            buttonItalic.Location = new Point(43, 7);
+            buttonItalic.Name = "buttonItalic";
+            buttonItalic.Size = new Size(28, 23);
+            buttonItalic.TabIndex = 1;
+            buttonItalic.Text = "I";
+            buttonItalic.UseVisualStyleBackColor = true;
+            buttonItalic.Click += buttonItalic_Click;
             // 
             // buttonBold
             // 
+            buttonBold.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 204);
             buttonBold.Location = new Point(9, 7);
             buttonBold.Name = "buttonBold";
             buttonBold.Size = new Size(28, 23);
             buttonBold.TabIndex = 0;
             buttonBold.Text = "B";
             buttonBold.UseVisualStyleBackColor = true;
+            buttonBold.Click += buttonBold_Click;
+            // 
+            // buttonUnderline
+            // 
+            buttonUnderline.Font = new Font("Segoe UI", 9F, FontStyle.Underline, GraphicsUnit.Point, 204);
+            buttonUnderline.Location = new Point(77, 7);
+            buttonUnderline.Name = "buttonUnderline";
+            buttonUnderline.Size = new Size(28, 23);
+            buttonUnderline.TabIndex = 2;
+            buttonUnderline.Text = "U";
+            buttonUnderline.UseVisualStyleBackColor = true;
+            buttonUnderline.Click += buttonUnderline_Click;
             // 
             // textBoxField
             // 
@@ -236,6 +254,7 @@
             contextMenuStripTextBoxField.Items.AddRange(new ToolStripItem[] { копироватьToolStripMenuItem1, выToolStripMenuItem, резатьToolStripMenuItem, toolStripMenuItem3, выделитьВсеToolStripMenuItem1 });
             contextMenuStripTextBoxField.Name = "contextMenuStripTextBoxField";
             contextMenuStripTextBoxField.Size = new Size(149, 98);
+            contextMenuStripTextBoxField.Opening += contextMenuStripTextBoxField_Opening;
             // 
             // копироватьToolStripMenuItem1
             // 
@@ -272,16 +291,13 @@
             // 
             // openFileDialog
             // 
-            openFileDialog.FileName = "openFileDialog1";
             openFileDialog.Filter = "Текстовые документы|*.txt|Все файлы|*.*";
-            openFileDialog.InitialDirectory = "C:\\";
             // 
             // saveFileDialog
             // 
             saveFileDialog.DefaultExt = "txt";
             saveFileDialog.FileName = "Безымянный";
             saveFileDialog.Filter = "Текстовые документы|*.txt|Все файлы|*.*";
-            saveFileDialog.InitialDirectory = "C:\\";
             // 
             // FormMain
             // 
@@ -295,7 +311,7 @@
             Name = "FormMain";
             Text = "Блокнот";
             Activated += FormMain_Activated;
-            FormClosed += FormMain_FormClosed;
+            FormClosing += FormMain_FormClosing;
             Load += FormMain_Load;
             menuStripMainMenu.ResumeLayout(false);
             menuStripMainMenu.PerformLayout();
@@ -320,7 +336,8 @@
         private TextBox textBoxField;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
-        private Button button1;
+        private Button buttonItalic;
+        private Button buttonUnderline;
         private ToolStripMenuItem правкаToolStripMenuItem;
         private ToolStripMenuItem форматToolStripMenuItem;
         private ToolStripMenuItem шрифтToolStripMenuItem;

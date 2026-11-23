@@ -1,4 +1,5 @@
-using System.Reflection;
+Ôªøusing System.Reflection;
+using System.ComponentModel;
 
 namespace Notepad
 {
@@ -13,47 +14,65 @@ namespace Notepad
             InitializeComponent();
         }
 
-        private void ‚˚ıÓ‰ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –≤—ã—Ö–æ–¥ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        void SaveChanges(object sender, EventArgs e)
+        bool SaveChanges(object sender, EventArgs e)
         {
-            if (MessageBox.Show("’ÓÚËÚÂ ÒÓı‡ÌËÚ¸ ˝ÚË ËÁÏÂÌÂÌËˇ?",
-                                    "¡˚ÎË ËÁÏÂÌÂÌËˇ Ò Ù‡ÈÎÓÏ",
-                                    MessageBoxButtons.YesNo) ==
-                                    DialogResult.Yes)
+            if (!wasChanged)
             {
-                ÒÓı‡ÌËÚ¸ToolStripMenuItem_Click(sender, e);
+                return true;
             }
+
+            TaskDialogButton saveButton = new TaskDialogButton("–°–æ—Ö—Ä–∞–Ω–∏—Ç—å");
+            TaskDialogButton discardButton = new TaskDialogButton("–ù–µ —Å–æ—Ö—Ä–∞–Ω—è—Ç—å");
+            TaskDialogPage page = new TaskDialogPage
+            {
+                Caption = "–ë–ª–æ–∫–Ω–æ—Ç",
+                Heading = "–°–æ—Ö—Ä–∞–Ω–∏—Ç—å –∏–∑–º–µ–Ω–µ–Ω–∏—è –≤ —Ç–µ–∫—É—â–µ–º –¥–æ–∫—É–º–µ–Ω—Ç–µ?",
+                Buttons = { saveButton, discardButton, TaskDialogButton.Cancel },
+                DefaultButton = saveButton
+            };
+
+            TaskDialogButton result = TaskDialog.ShowDialog(this, page, TaskDialogStartupLocation.CenterOwner);
+            if (result == saveButton)
+            {
+                —Å–æ—Ö—Ä–∞–Ω–∏—Ç—åToolStripMenuItem_Click(sender, e);
+                return !wasChanged;
+            }
+
+            return result == discardButton;
         }
 
-        private void ÒÓÁ‰‡Ú¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void —Å–æ–∑–¥–∞—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (wasChanged)
+            if (!SaveChanges(sender, e))
             {
-                SaveChanges(sender, e);
+                return;
             }
 
             textBoxField.Text = "";
             current_filename = "";
             wasChanged = false;
+            UpdateTitle();
         }
 
-        private void ÓÚÍ˚Ú¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –æ—Ç–∫—Ä—ã—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!SaveChanges(sender, e))
+            {
+                return;
+            }
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                if (wasChanged)
-                {
-                    SaveChanges(sender, e);
-                }
                 StreamReader sr = new StreamReader(openFileDialog.FileName);
                 textBoxField.Text = sr.ReadToEnd();
                 sr.Close();
                 current_filename = openFileDialog.FileName;
                 wasChanged = false;
+                UpdateTitle();
 
                 /*string s="";
                 while (!sr.EndOfStream)
@@ -65,46 +84,65 @@ namespace Notepad
 
         void SaveToFile(string filename)
         {
-            StreamWriter sw = new StreamWriter(filename);
-            sw.WriteLine(textBoxField.Text);
-            sw.WriteLine(sign);
-            sw.Close();
+            try
+            {
+                StreamWriter sw = new StreamWriter(filename);
+                sw.WriteLine(textBoxField.Text);
+                sw.WriteLine(sign);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, "–ù–µ —É–¥–∞–ª–æ—Å—å —Å–æ—Ö—Ä–∞–Ω–∏—Ç—å —Ñ–∞–π–ª:\n" + ex.Message, "–û—à–∏–±–∫–∞");
+                return;
+            }
+            current_filename = filename;
             wasChanged = false;
+            UpdateTitle();
         }
 
-        private void ÒÓı‡ÌËÚ¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        void UpdateTitle()
+        {
+            Text = (current_filename == "" ? "–ë–µ–∑—ã–º—è–Ω–Ω—ã–π" : Path.GetFileName(current_filename)) + " - –ë–ª–æ–∫–Ω–æ—Ç";
+        }
+
+        private void —Å–æ—Ö—Ä–∞–Ω–∏—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(current_filename))
             {
-                ÒÓı‡ÌËÚ¸ ‡ÍToolStripMenuItem_Click(sender, e);
+                —Å–æ—Ö—Ä–∞–Ω–∏—Ç—å–ö–∞–∫ToolStripMenuItem_Click(sender, e);
                 return;
             }
             SaveToFile(current_filename);
         }
 
-        private void ÒÓı‡ÌËÚ¸ ‡ÍToolStripMenuItem_Click(object sender, EventArgs e)
+        private void —Å–æ—Ö—Ä–∞–Ω–∏—Ç—å–ö–∞–∫ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 SaveToFile(saveFileDialog.FileName);
-                current_filename = saveFileDialog.FileName;
             }
         }
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            StreamReader sr = new StreamReader("settings.txt");
-            textBoxField.Font = new Font(textBoxField.Font.FontFamily, int.Parse(sr.ReadLine()));
+            string settingsFile = Path.Combine(Application.StartupPath, "settings.txt");
             sign = "";
-            while (!sr.EndOfStream)
+            if (File.Exists(settingsFile))
             {
-                sign += "\r\n" + sr.ReadLine();
+                StreamReader sr = new StreamReader(settingsFile);
+                textBoxField.Font = new Font(textBoxField.Font.FontFamily, int.Parse(sr.ReadLine()));
+                while (!sr.EndOfStream)
+                {
+                    sign += "\r\n" + sr.ReadLine();
+                }
+                sr.Close();
             }
-            sr.Close();
 
             fontDialog.Font = textBoxField.Font;
             colorDialog.Color = textBoxField.ForeColor;
-            Clipboard.Clear();
+            ActiveControl = textBoxField;
+            UpdateTitle();
         }
 
         private void textBoxField_TextChanged(object sender, EventArgs e)
@@ -112,23 +150,24 @@ namespace Notepad
             wasChanged = true;
         }
 
-        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (wasChanged)
+            if (!SaveChanges(sender, e))
             {
-                SaveChanges(sender, e);
+                e.Cancel = true;
             }
         }
 
-        private void ¯ËÙÚToolStripMenuItem_Click(object sender, EventArgs e)
+        private void —à—Ä–∏—Ñ—ÇToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            fontDialog.Font = textBoxField.Font;
             if (fontDialog.ShowDialog() == DialogResult.OK)
             {
                 textBoxField.Font = fontDialog.Font;
             }
         }
 
-        private void ˆ‚ÂÚToolStripMenuItem_Click(object sender, EventArgs e)
+        private void —Ü–≤–µ—ÇToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
@@ -136,30 +175,77 @@ namespace Notepad
             }
         }
 
-        private void ‚˚‰ÂÎËÚ¸¬ÒÂToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –≤—ã–¥–µ–ª–∏—Ç—å–í—Å–µToolStripMenuItem_Click(object sender, EventArgs e)
         {
             textBoxField.SelectAll();
+            textBoxField.Focus();
         }
 
-        private void ÍÓÔËÓ‚‡Ú¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
             textBoxField.Copy();
         }
 
-        private void ‚˚ÂÁ‡Ú¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –≤—ã—Ä–µ–∑–∞—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
             textBoxField.Cut();
         }
 
-        private void ‚ÒÚ‡‚ËÚ¸ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –≤—Å—Ç–∞–≤–∏—Ç—åToolStripMenuItem_Click(object sender, EventArgs e)
         {
             textBoxField.Paste();
         }
 
-        private void Ì‡ÒÚÓÈÍËToolStripMenuItem_Click(object sender, EventArgs e)
+        private void –Ω–∞—Å—Ç—Ä–æ–π–∫–∏ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FormSettings frm = new FormSettings();
             frm.ShowDialog();
+        }
+
+        void UpdateEditMenu()
+        {
+            bool hasSelection = textBoxField.SelectionLength > 0;
+            bool canPaste = Clipboard.ContainsText();
+            bool hasText = textBoxField.TextLength > 0;
+            –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—åToolStripMenuItem.Enabled = hasSelection;
+            –≤—ã—Ä–µ–∑–∞—Ç—åToolStripMenuItem.Enabled = hasSelection;
+            –≤—Å—Ç–∞–≤–∏—Ç—åToolStripMenuItem.Enabled = canPaste;
+            –≤—ã–¥–µ–ª–∏—Ç—å–í—Å–µToolStripMenuItem.Enabled = hasText;
+            –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—åToolStripMenuItem1.Enabled = hasSelection;
+            –≤—ãToolStripMenuItem.Enabled = hasSelection;
+            —Ä–µ–∑–∞—Ç—åToolStripMenuItem.Enabled = canPaste;
+            –≤—ã–¥–µ–ª–∏—Ç—å–í—Å–µToolStripMenuItem1.Enabled = hasText;
+        }
+
+        private void –ø—Ä–∞–≤–∫–∞ToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            UpdateEditMenu();
+        }
+
+        private void contextMenuStripTextBoxField_Opening(object sender, CancelEventArgs e)
+        {
+            UpdateEditMenu();
+        }
+
+        void ToggleStyle(FontStyle style)
+        {
+            textBoxField.Font = new Font(textBoxField.Font, textBoxField.Font.Style ^ style);
+            textBoxField.Focus();
+        }
+
+        private void buttonBold_Click(object sender, EventArgs e)
+        {
+            ToggleStyle(FontStyle.Bold);
+        }
+
+        private void buttonItalic_Click(object sender, EventArgs e)
+        {
+            ToggleStyle(FontStyle.Italic);
+        }
+
+        private void buttonUnderline_Click(object sender, EventArgs e)
+        {
+            ToggleStyle(FontStyle.Underline);
         }
 
         private void FormMain_Activated(object sender, EventArgs e)

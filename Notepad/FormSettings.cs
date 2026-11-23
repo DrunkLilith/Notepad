@@ -19,7 +19,7 @@ namespace Notepad
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            StreamWriter sw = new StreamWriter("settings.txt");
+            StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "settings.txt"));
             sw.WriteLine(numericUpDownFontSize.Value);
             sw.WriteLine(textBoxSign.Text);
             sw.Close();
